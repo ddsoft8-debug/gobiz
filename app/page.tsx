@@ -171,6 +171,31 @@ export default function Home() {
   }, [menuOpen]);
 
   const extraLinks = useMemo(() => {
+    if (page === "main") {
+      return [
+        {
+          page: "preparation" as PageKey,
+          label: "수출 준비 서비스 바로가기",
+          rect: { x: 260, y: 355, width: 345, height: 515 },
+        },
+        {
+          page: "execution" as PageKey,
+          label: "수출 시행 서비스 바로가기",
+          rect: { x: 620, y: 355, width: 345, height: 515 },
+        },
+        {
+          page: "logistics" as PageKey,
+          label: "물류 지원 서비스 바로가기",
+          rect: { x: 980, y: 355, width: 345, height: 515 },
+        },
+        {
+          page: "global" as PageKey,
+          label: "글로벌 확장 서비스 바로가기",
+          rect: { x: 1340, y: 355, width: 345, height: 515 },
+        },
+      ];
+    }
+
     if (page === "logistics") {
       return [
         {
@@ -267,13 +292,23 @@ export default function Home() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="screen-image" src={screen.src} alt={`${screen.title} 화면`} />
 
+        <div className="screen-reveal" aria-hidden="true">
+          {[0, 1, 2, 3].map((index) => (
+            <span
+              key={index}
+              style={{ top: `${index * 25}%`, animationDelay: `${0.08 + index * 0.12}s` }}
+            />
+          ))}
+        </div>
+
         {headerLinks.map((link) => (
           <a
             key={link.page}
-            className="hotspot"
+            className="hotspot hotspot-nav"
             style={rectStyle(link.rect, screen.height)}
             href={`#${pageHashes[link.page]}`}
             aria-label={link.label}
+            title={link.label}
             onClick={(event) => {
               event.preventDefault();
               navigate(link.page);
@@ -283,12 +318,13 @@ export default function Home() {
 
         <button
           ref={menuButtonRef}
-          className="hotspot hotspot-button"
+          className="hotspot hotspot-button hotspot-nav"
           style={rectStyle({ x: 1450, y: 82, width: 175, height: 66 }, screen.height)}
           type="button"
           aria-expanded={menuOpen}
           aria-controls="site-menu"
           aria-label="전체메뉴 열기"
+          title="전체메뉴 열기"
           onClick={() => {
             setActiveMenuTab("guide");
             setMenuOpen(true);
@@ -298,10 +334,11 @@ export default function Home() {
         {extraLinks.map((link) => (
           <a
             key={link.label}
-            className="hotspot"
+            className="hotspot hotspot-content"
             style={rectStyle(link.rect, screen.height)}
             href={`#${pageHashes[link.page]}`}
             aria-label={link.label}
+            title={link.label}
             onClick={(event) => {
               event.preventDefault();
               navigate(link.page);
