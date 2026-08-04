@@ -292,15 +292,6 @@ export default function Home() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="screen-image" src={screen.src} alt={`${screen.title} 화면`} />
 
-        <div className="screen-reveal" aria-hidden="true">
-          {[0, 1, 2, 3].map((index) => (
-            <span
-              key={index}
-              style={{ top: `${index * 25}%`, animationDelay: `${0.08 + index * 0.12}s` }}
-            />
-          ))}
-        </div>
-
         {headerLinks.map((link) => (
           <a
             key={link.page}

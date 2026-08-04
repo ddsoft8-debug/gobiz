@@ -31,7 +31,6 @@ a {
 .screen-stage {
   position: relative;
   width: 100%;
-  animation: screen-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
   outline: none;
 }
 
@@ -40,6 +39,8 @@ a {
   width: 100%;
   height: auto;
   user-select: none;
+  will-change: clip-path, opacity;
+  animation: screen-image-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hotspot {
@@ -47,7 +48,7 @@ a {
   z-index: 2;
   display: block;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   cursor: pointer;
   transition: background-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
@@ -62,24 +63,6 @@ a {
   outline: 3px solid var(--focus);
   outline-offset: -3px;
   background: rgb(0 91 215 / 7%);
-}
-
-.screen-reveal {
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.screen-reveal span {
-  position: absolute;
-  right: 0;
-  left: 0;
-  height: 25.15%;
-  background: linear-gradient(180deg, #ffffff 0%, #ffffff 88%, rgb(255 255 255 / 82%) 100%);
-  transform-origin: top;
-  animation: reveal-section 0.62s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 .site-menu {
@@ -144,7 +127,7 @@ a {
   height: 80%;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
@@ -230,25 +213,14 @@ a {
   border: 0;
 }
 
-@keyframes screen-in {
+@keyframes screen-image-reveal {
   from {
-    opacity: 0;
-    transform: translateY(10px);
+    opacity: 0.45;
+    clip-path: inset(0 0 100% 0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes reveal-section {
-  from {
-    opacity: 1;
-    transform: scaleY(1);
-  }
-  to {
-    opacity: 0;
-    transform: scaleY(0);
+    clip-path: inset(0);
   }
 }
 
@@ -304,17 +276,13 @@ a {
     scroll-behavior: auto;
   }
 
-  .screen-stage,
+  .screen-image,
   .site-menu,
   .site-menu-title,
   .site-menu-tabs,
   .site-menu-scroll,
   .site-menu-content-image {
     animation: none;
-  }
-
-  .screen-reveal {
-    display: none;
   }
 
   .site-menu-close,
