@@ -295,7 +295,7 @@ export default function Home() {
         {headerLinks.map((link) => (
           <a
             key={link.page}
-            className="hotspot hotspot-nav"
+            className={`hotspot ${link.page === "main" ? "hotspot-logo" : "hotspot-nav"}`}
             style={rectStyle(link.rect, screen.height)}
             href={`#${pageHashes[link.page]}`}
             aria-label={link.label}
