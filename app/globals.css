@@ -28,8 +28,7 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-.screen-stage,
-.site-menu-content {
+.screen-stage {
   position: relative;
   width: 100%;
 }
@@ -70,16 +69,146 @@ a {
 .site-menu {
   position: fixed;
   z-index: 100;
-  inset: 0;
-  overflow-y: auto;
+  top: calc(100vw * 150 / 1920);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   overscroll-behavior: contain;
   background: #ffffff;
   animation: menu-backdrop-in 0.24s ease-out both;
 }
 
-.site-menu-content {
-  min-height: 100%;
+.site-menu-title,
+.site-menu-tabs {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.site-menu-title {
+  height: calc(100vw * 90 / 1920);
+}
+
+.site-menu-tabs {
+  height: calc(100vw * 82 / 1920);
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.site-menu-image {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.site-menu-title-image {
+  top: calc(100vw * -86 / 1920);
+}
+
+.site-menu-tabs-image {
+  top: calc(100vw * -176 / 1920);
+}
+
+.site-menu-close {
+  position: absolute;
+  z-index: 3;
+  top: 10%;
+  left: 81%;
+  width: 4.5%;
+  height: 80%;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.site-menu-close:hover {
+  background: rgb(0 0 0 / 6%);
+  transform: rotate(4deg);
+}
+
+.site-menu-close:focus-visible,
+.site-menu-tab:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+
+.site-menu-tab {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.22s ease;
+}
+
+.site-menu-tab::after {
+  position: absolute;
+  right: 14%;
+  bottom: 0;
+  left: 14%;
+  height: 3px;
+  background: #ef233c;
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.45);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.site-menu-tab:hover {
+  background: rgb(239 35 60 / 6%);
+}
+
+.site-menu-tab:hover::after,
+.site-menu-tab.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.site-menu-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: #9aa4b2 #f3f5f7;
+  scrollbar-width: thin;
+}
+
+.site-menu-scroll-art {
+  position: relative;
+  width: 100%;
+  height: calc(100vw * 2784 / 1920);
+  overflow: hidden;
+}
+
+.site-menu-content-image {
+  top: calc(100vw * -258 / 1920);
   animation: menu-content-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @keyframes screen-in {
@@ -123,7 +252,13 @@ a {
 
   .screen-stage,
   .site-menu,
-  .site-menu-content {
+  .site-menu-content-image {
     animation: none;
+  }
+
+  .site-menu-close,
+  .site-menu-tab,
+  .site-menu-tab::after {
+    transition: none;
   }
 }

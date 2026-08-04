@@ -13,8 +13,24 @@ type PageKey =
   | "notice-detail";
 
 type Rect = { x: number; y: number; width: number; height: number };
+type SitemapTabKey = "guide" | "preparation" | "execution" | "logistics" | "global" | "mypage";
 
 const SCREEN_WIDTH = 1920;
+const SITEMAP_CONTENT_START = 258;
+
+const sitemapTabs: Array<{
+  key: SitemapTabKey;
+  label: string;
+  targetY: number;
+  rect: Pick<Rect, "x" | "width">;
+}> = [
+  { key: "guide", label: "고비즈 안내", targetY: 258, rect: { x: 300, width: 180 } },
+  { key: "preparation", label: "수출준비", targetY: 575, rect: { x: 485, width: 155 } },
+  { key: "execution", label: "수출실행", targetY: 1125, rect: { x: 640, width: 155 } },
+  { key: "logistics", label: "물류지원", targetY: 1420, rect: { x: 795, width: 155 } },
+  { key: "global", label: "글로벌확장", targetY: 1805, rect: { x: 950, width: 180 } },
+  { key: "mypage", label: "마이페이지", targetY: 2115, rect: { x: 1130, width: 180 } },
+];
 
 const screens: Record<PageKey, { src: string; height: number; title: string }> = {
   main: { src: "/screens/main.svg", height: 1214, title: "고비즈코리아" },
@@ -104,9 +120,11 @@ function getInitialPage(): PageKey {
 export default function Home() {
   const [page, setPage] = useState<PageKey>(getInitialPage);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeMenuTab, setActiveMenuTab] = useState<SitemapTabKey>("guide");
   const stageRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const menuScrollRef = useRef<HTMLDivElement>(null);
   const screen = screens[page];
 
   useEffect(() => {
@@ -141,10 +159,6 @@ export default function Home() {
 
     const handleKeydown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);
-      if (event.key === "Tab") {
-        event.preventDefault();
-        closeButtonRef.current?.focus();
-      }
     };
 
     document.addEventListener("keydown", handleKeydown);
@@ -206,6 +220,8 @@ export default function Home() {
   }, [page]);
 
   const navigate = (nextPage: PageKey) => {
+    if (menuOpen) setMenuOpen(false);
+
     if (nextPage === page) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -215,6 +231,27 @@ export default function Home() {
     setPage(nextPage);
     window.scrollTo({ top: 0, behavior: "instant" });
     window.setTimeout(() => stageRef.current?.focus(), 30);
+  };
+
+  const moveToSitemapSection = (tab: (typeof sitemapTabs)[number]) => {
+    const scrollArea = menuScrollRef.current;
+    if (!scrollArea) return;
+
+    setActiveMenuTab(tab.key);
+    scrollArea.scrollTo({
+      top: ((tab.targetY - SITEMAP_CONTENT_START) / SCREEN_WIDTH) * scrollArea.clientWidth,
+      behavior: "smooth",
+    });
+  };
+
+  const updateActiveSitemapTab = () => {
+    const scrollArea = menuScrollRef.current;
+    if (!scrollArea) return;
+
+    const sourceY =
+      SITEMAP_CONTENT_START + (scrollArea.scrollTop / scrollArea.clientWidth) * SCREEN_WIDTH + 80;
+    const current = [...sitemapTabs].reverse().find((tab) => sourceY >= tab.targetY);
+    if (current) setActiveMenuTab(current.key);
   };
 
   return (
@@ -249,11 +286,13 @@ export default function Home() {
           className="hotspot hotspot-button"
           style={rectStyle({ x: 1450, y: 82, width: 175, height: 66 }, screen.height)}
           type="button"
-          aria-haspopup="dialog"
           aria-expanded={menuOpen}
           aria-controls="site-menu"
           aria-label="전체메뉴 열기"
-          onClick={() => setMenuOpen(true)}
+          onClick={() => {
+            setActiveMenuTab("guide");
+            setMenuOpen(true);
+          }}
         />
 
         {extraLinks.map((link) => (
@@ -275,21 +314,50 @@ export default function Home() {
         <div
           id="site-menu"
           className="site-menu"
-          role="dialog"
-          aria-modal="true"
+          role="navigation"
           aria-label="전체메뉴"
         >
-          <div className="site-menu-content">
+          <div className="site-menu-title">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="screen-image" src="/screens/sitemap.svg" alt="고비즈코리아 전체메뉴" />
+            <img className="site-menu-image site-menu-title-image" src="/screens/sitemap.svg" alt="" />
+            <h2 className="sr-only">사이트맵</h2>
             <button
               ref={closeButtonRef}
-              className="hotspot hotspot-button"
-              style={rectStyle({ x: 1555, y: 88, width: 90, height: 90 }, 3042)}
+              className="site-menu-close"
               type="button"
               aria-label="전체메뉴 닫기"
               onClick={() => setMenuOpen(false)}
             />
+          </div>
+
+          <div className="site-menu-tabs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="site-menu-image site-menu-tabs-image" src="/screens/sitemap.svg" alt="" />
+            {sitemapTabs.map((tab) => (
+              <button
+                key={tab.key}
+                className={`site-menu-tab${activeMenuTab === tab.key ? " active" : ""}`}
+                style={{
+                  left: `${(tab.rect.x / SCREEN_WIDTH) * 100}%`,
+                  width: `${(tab.rect.width / SCREEN_WIDTH) * 100}%`,
+                }}
+                type="button"
+                aria-label={`${tab.label} 메뉴로 이동`}
+                aria-current={activeMenuTab === tab.key ? "true" : undefined}
+                onClick={() => moveToSitemapSection(tab)}
+              />
+            ))}
+          </div>
+
+          <div ref={menuScrollRef} className="site-menu-scroll" onScroll={updateActiveSitemapTab}>
+            <div className="site-menu-scroll-art">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="site-menu-image site-menu-content-image"
+                src="/screens/sitemap.svg"
+                alt="고비즈코리아 사이트맵 메뉴 내용"
+              />
+            </div>
           </div>
         </div>
       )}
